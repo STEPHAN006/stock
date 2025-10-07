@@ -49,7 +49,10 @@ export default function EntreePage() {
     try {
       const response = await fetch('/api/inventory')
       const data = await response.json()
-      setPieces(data.pieces || [])
+      if (!response.ok) {
+        throw new Error(data?.error || 'Erreur API inventaire')
+      }
+      setPieces(Array.isArray(data.pieces) ? data.pieces : [])
     } catch (error) {
       console.error('Erreur lors du chargement des pièces:', error)
       toast.error('Erreur lors du chargement des pièces')
@@ -60,7 +63,10 @@ export default function EntreePage() {
     try {
       const response = await fetch('/api/suppliers')
       const data = await response.json()
-      setSuppliers(data || [])
+      if (!response.ok && !Array.isArray(data)) {
+        throw new Error(data?.error || 'Erreur API fournisseurs')
+      }
+      setSuppliers(Array.isArray(data) ? data : [])
     } catch (error) {
       console.error('Erreur lors du chargement des fournisseurs:', error)
       toast.error('Erreur lors du chargement des fournisseurs')

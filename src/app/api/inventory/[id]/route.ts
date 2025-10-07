@@ -73,9 +73,12 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params
-    await prisma.piece.delete({
-      where: { id: parseInt(id) }
-    })
+    // Supprimer d'abord les dépendances (Entrées/Sorties) puis la pièce
+    await prisma.$transaction([
+      prisma.entry.deleteMany({ where: { pieceId: parseInt(id) } }),
+      prisma.exit.deleteMany({ where: { pieceId: parseInt(id) } }),
+      prisma.piece.delete({ where: { id: parseInt(id) } })
+    ])
 
     return NextResponse.json({ message: 'Pièce supprimée avec succès' })
   } catch (error) {

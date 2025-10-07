@@ -37,9 +37,12 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params
-    await prisma.supplier.delete({
-      where: { id: parseInt(id) }
-    })
+    // Supprimer d'abord les entrées liées à ce fournisseur
+    const supplierId = parseInt(id)
+    await prisma.$transaction([
+      prisma.entry.deleteMany({ where: { supplierId } }),
+      prisma.supplier.delete({ where: { id: supplierId } })
+    ])
 
     return NextResponse.json({ message: 'Fournisseur supprimé avec succès' })
   } catch (error) {

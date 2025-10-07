@@ -4,25 +4,25 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { 
-  LayoutDashboard, 
   Package, 
   ArrowDownToLine, 
   ArrowUpFromLine, 
   Truck, 
   Users, 
   History,
+  Settings,
   LogOut
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
   { name: 'Inventaire', href: '/inventaire', icon: Package },
   { name: 'Entrée', href: '/entree', icon: ArrowDownToLine },
   { name: 'Sortie', href: '/sortie', icon: ArrowUpFromLine },
   { name: 'Fournisseurs', href: '/fournisseurs', icon: Truck },
   { name: 'Techniciens', href: '/techniciens', icon: Users },
   { name: 'Historique', href: '/historique', icon: History },
+  { name: 'Paramètres', href: '/parametres', icon: Settings },
 ]
 
 export function Sidebar() {

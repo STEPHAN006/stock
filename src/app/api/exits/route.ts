@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { sendLowStockAlert } from '@/lib/email'
 
 export async function GET(request: NextRequest) {
   try {
@@ -88,7 +89,7 @@ export async function POST(request: NextRequest) {
         }
       })
 
-      await tx.piece.update({
+      const updatedPiece = await tx.piece.update({
         where: { id: parseInt(pieceId) },
         data: {
           stock: {
@@ -97,10 +98,20 @@ export async function POST(request: NextRequest) {
         }
       })
 
-      return exit
+      return { exit, updatedPiece }
     })
 
-    return NextResponse.json(result, { status: 201 })
+    // Déclenchement email si seuil atteint/après passage sous seuil
+    try {
+      const { updatedPiece } = result as { updatedPiece: { name: string, stock: number, minStock: number } }
+      if (updatedPiece.minStock > 0 && updatedPiece.stock <= updatedPiece.minStock) {
+        await sendLowStockAlert(updatedPiece.name, updatedPiece.stock, updatedPiece.minStock)
+      }
+    } catch (e) {
+      console.error('Erreur lors de l\'envoi de l\'alerte email:', e)
+    }
+
+    return NextResponse.json((result as any).exit, { status: 201 })
   } catch (error) {
     console.error('Erreur lors de la création de la sortie:', error)
     return NextResponse.json(

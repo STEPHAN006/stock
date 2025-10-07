@@ -39,7 +39,16 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Erreur lors de la récupération de l\'inventaire:', error)
     return NextResponse.json(
-      { error: 'Erreur interne du serveur' },
+      {
+        pieces: [],
+        pagination: {
+          page: 1,
+          limit: 10,
+          total: 0,
+          pages: 0
+        },
+        error: 'Erreur interne du serveur'
+      },
       { status: 500 }
     )
   }

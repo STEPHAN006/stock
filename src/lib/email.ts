@@ -1,14 +1,20 @@
 import { Resend } from 'resend'
+import { prisma } from './prisma'
 
 const resend = new Resend('re_DEJhMSMh_FfovscBRuyWV8hSESsGxnR1v')
 
 export async function sendLowStockAlert(pieceName: string, currentStock: number, minStock: number) {
   try {
     console.log(`📧 Tentative d'envoi d'email pour: ${pieceName} - Stock: ${currentStock}/${minStock}`)
+    // Récupérer les destinataires depuis les paramètres (fallback si vide)
+    const settings = await prisma.settings.findUnique({ where: { id: 1 } })
+    const recipients = (settings?.emails && settings.emails.length > 0)
+      ? settings.emails
+      : ['stephystephan13@gmail.com']
 
     const { data, error } = await resend.emails.send({
       from: 'GESTION DE STOCK <onboarding@resend.dev>',
-      to: ['stephystephan13@gmail.com'], // Email de l'administrateur (doit correspondre au compte Resend)
+      to: recipients, // Emails configurés dans les paramètres
       subject: `🚨 Alerte Stock Bas - ${pieceName}`,
       html: `
         <h2>🚨 Alerte Stock Bas</h2>

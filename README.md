@@ -112,13 +112,59 @@ src/
 - `pnpm db:seed` : Peupler la base de données avec des données de test
 - `pnpm db:reset` : Réinitialiser la base de données et la repeupler
 
+### Variables d'environnement (Supabase)
+Ajoutez ces variables dans `.env.local` pour activer Supabase:
+```bash
+NEXT_PUBLIC_SUPABASE_URL="https://YOUR-PROJECT.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="YOUR-ANON-KEY"
+# Pour Prisma (si vous basculez sur la base Supabase Postgres)
+DATABASE_URL="postgresql://postgres:password@host:6543/postgres?pgbouncer=true&connection_limit=1"
+```
+
+Commandes utiles après configuration:
+```bash
+pnpm install
+pnpm prisma generate
+pnpm db:migrate
+pnpm dev
+```
+
 ## 🔧 Configuration
 
 ### Base de données
-La base de données SQLite est stockée dans `prisma/dev.db`. Pour utiliser une autre base de données, modifiez la variable `DATABASE_URL` dans `.env.local`.
+Par défaut, le projet utilise SQLite en local (`prisma/dev.db`).
+
+#### Utiliser Supabase (Postgres géré)
+1. Créez un projet Supabase puis récupérez:
+   - `Project URL`
+   - `anon public key`
+   - `database connection string`
+
+2. Dans `.env.local`, définissez les variables:
+   ```bash
+   # Supabase Auth (client)
+   NEXT_PUBLIC_SUPABASE_URL="..."
+   NEXT_PUBLIC_SUPABASE_ANON_KEY="..."
+
+   # Prisma -> Supabase Postgres (Pooled URL pour l'app)
+   DATABASE_URL="postgresql://postgres:password@host:6543/postgres?pgbouncer=true&connection_limit=1"
+   # Prisma direct (non-pooled) pour prisma migrate (port 5432)
+   DIRECT_URL="postgresql://postgres:password@host:5432/postgres"
+   ```
+
+3. Régénérez Prisma et appliquez les migrations sur Supabase (utilise DIRECT_URL automatiquement):
+   ```bash
+   pnpm prisma generate
+   pnpm db:migrate
+   ```
+
+4. (Optionnel) Seed de données (créera les tables si nécessaires):
+   ```bash
+   pnpm db:seed
+   ```
 
 ### Authentification
-L'authentification est volontairement simplifiée pour cette démo. En production, utilisez une solution robuste comme NextAuth.js ou Auth0.
+L'authentification utilise désormais Supabase Auth (email/password). Créez un utilisateur dans l'onglet Auth de Supabase pour vous connecter.
 
 ## 📝 API Endpoints
 

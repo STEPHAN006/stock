@@ -7,8 +7,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -64,4 +65,11 @@ model Exit {
   observation  String?
   piece        Piece      @relation(fields: [pieceId], references: [id])
   technician   Technician @relation(fields: [technicianId], references: [id])
+}
+
+/// Paramètres globaux de notification (emails destinataires)
+model Settings {
+  id      Int       @id @default(1)
+  emails  String[]  @default([])
+  updatedAt DateTime @updatedAt
 }

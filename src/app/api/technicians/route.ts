@@ -10,10 +10,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(technicians)
   } catch (error) {
     console.error('Erreur lors de la récupération des techniciens:', error)
-    return NextResponse.json(
-      { error: 'Erreur interne du serveur' },
-      { status: 500 }
-    )
+    return NextResponse.json([], { status: 500 })
   }
 }
 

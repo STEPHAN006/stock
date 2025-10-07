@@ -37,9 +37,12 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params
-    await prisma.technician.delete({
-      where: { id: parseInt(id) }
-    })
+    // Supprimer d'abord les sorties liées à ce technicien
+    const technicianId = parseInt(id)
+    await prisma.$transaction([
+      prisma.exit.deleteMany({ where: { technicianId } }),
+      prisma.technician.delete({ where: { id: technicianId } })
+    ])
 
     return NextResponse.json({ message: 'Technicien supprimé avec succès' })
   } catch (error) {

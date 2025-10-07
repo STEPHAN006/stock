@@ -50,7 +50,10 @@ export default function SortiePage() {
     try {
       const response = await fetch('/api/inventory')
       const data = await response.json()
-      setPieces(data.pieces || [])
+      if (!response.ok) {
+        throw new Error(data?.error || 'Erreur API inventaire')
+      }
+      setPieces(Array.isArray(data.pieces) ? data.pieces : [])
     } catch (error) {
       console.error('Erreur lors du chargement des pièces:', error)
       toast.error('Erreur lors du chargement des pièces')
@@ -61,7 +64,10 @@ export default function SortiePage() {
     try {
       const response = await fetch('/api/technicians')
       const data = await response.json()
-      setTechnicians(data || [])
+      if (!response.ok && !Array.isArray(data)) {
+        throw new Error(data?.error || 'Erreur API techniciens')
+      }
+      setTechnicians(Array.isArray(data) ? data : [])
     } catch (error) {
       console.error('Erreur lors du chargement des techniciens:', error)
       toast.error('Erreur lors du chargement des techniciens')

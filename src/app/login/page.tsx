@@ -25,21 +25,17 @@ export default function LoginPage() {
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
       })
-
       const data = await response.json()
-
       if (response.ok) {
         localStorage.setItem('token', data.token)
         localStorage.setItem('user', JSON.stringify(data.user))
         toast.success(`Bienvenue ${data.user.name || data.user.email} !`)
         router.push('/')
       } else {
-        setError(data.error || 'Erreur de connexion')
+        setError(data.error || 'Identifiants invalides')
       }
     } catch (error) {
       setError('Erreur de connexion')
